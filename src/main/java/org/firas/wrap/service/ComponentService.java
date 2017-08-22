@@ -7,6 +7,8 @@ import org.firas.wrap.datatype.ComponentNameNotUniqueException;
 import org.firas.wrap.entity.Component;
 import org.firas.wrap.repository.ComponentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,11 +42,19 @@ public class ComponentService {
         return component;
     }
 
-    public List<Component> findByNameContaining(String name) {
+    public Page<Component> findByNameContaining(
+            String name, int page, int size) {
         return componentRepository.findByNameContainingAndStatus(
-                name, Component.STATUS_DELETED);
+                name, Component.STATUS_DELETED,
+                new PageRequest(page - 1, size));
     }
-    
+
+    public Page<Component> findComponents(int page, int size) {
+        return componentRepository.findByStatusNot(
+                Component.STATUS_DELETED,
+                new PageRequest(page - 1, size));
+    }
+
     @Transactional
     public Component create(Component component) throws ComponentNameNotUniqueException {
         component.setId(null);
@@ -53,11 +63,14 @@ public class ComponentService {
     }
 
     @Transactional
-    public Component update(Component component) throws ComponentIdNotFoundException {
+    public Component update(Component component)
+            throws ComponentIdNotFoundException,
+            ComponentNameNotUniqueException {
         Component c = getById(component.getId());
         boolean changed = false;
         if (!c.getName().equals(component.getName())) {
             changed = true;
+            ensureNameUnique(component.getName());
             c.setName(component.getName());
         }
         if (changed) {

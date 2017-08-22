@@ -4,5 +4,5 @@ import java.util.HashMap;
 
 public interface ModelParser<T> {
 
-    public HashMap<String, Object> parse(T model);
+    HashMap<String, Object> parse(T model);
 }

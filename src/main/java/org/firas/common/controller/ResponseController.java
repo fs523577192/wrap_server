@@ -28,7 +28,7 @@ public abstract class ResponseController {
     protected <T> HashMap<String, Object> parsePage(
             Page<T> page, ModelParser<T> dataParser) {
         HashMap<String, Object> result = new HashMap<String, Object>();
-        result.put("page", page.getNumber());
+        result.put("page", Math.min(page.getNumber(), page.getTotalPages()));
         result.put("pages", page.getTotalPages());
         result.put("is_first", page.isFirst());
         result.put("is_last", page.isLast());
