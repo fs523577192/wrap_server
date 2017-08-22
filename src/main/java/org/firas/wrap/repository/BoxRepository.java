@@ -8,5 +8,7 @@ import org.firas.wrap.entity.Box;
 
 public interface BoxRepository extends JpaRepository<Box, Integer> {
 
-    List<Box> findByNameContainingAndStatus(String name, Byte status);
+    Box findFirstByNameAndStatusNot(String name, byte status);
+
+    List<Box> findByNameContainingAndStatus(String name, byte status);
 }

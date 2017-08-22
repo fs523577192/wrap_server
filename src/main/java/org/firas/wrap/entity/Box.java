@@ -23,9 +23,17 @@ public class Box extends org.firas.common.model.IdModel {
     private static final long serialVersionUID = 1L;
 
     public Box(String name) {
-        this.name = name;
+        setName(name);
     }
 
-    @Column(nullable = false, length = 100)
-    @Getter @Setter private String name;
+    public static final int NAME_MIN_LENGTH = 1, NAME_MAX_LENGTH = 100;
+    @Column(nullable = false, length = NAME_MAX_LENGTH)
+    @Getter private String name;
+    public Box setName(String name) {
+        this.name = null == name ? null : name.trim();
+        if (null != this.name && this.name.length() <= 0) {
+            this.name = null;
+        }
+        return this;
+    }
 }
