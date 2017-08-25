@@ -1,18 +1,26 @@
 package org.firas.wrap.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
-import org.firas.wrap.datatype.ComponentIdNotFoundException;
-import org.firas.wrap.datatype.ComponentNameNotFoundException;
-import org.firas.wrap.datatype.ComponentNameNotUniqueException;
-import org.firas.wrap.entity.Component;
-import org.firas.wrap.repository.ComponentRepository;
+import org.firas.common.request.PageInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import org.firas.common.validator.IValidator;
+import org.firas.common.validator.IntegerValidator;
+import org.firas.common.validator.StringValidator;
+import org.firas.common.validator.ValidationException;
+import org.firas.wrap.datatype.ComponentIdNotFoundException;
+import org.firas.wrap.datatype.ComponentNameNotFoundException;
+import org.firas.wrap.datatype.ComponentNameNotUniqueException;
+import org.firas.wrap.entity.Component;
+import org.firas.wrap.input.ComponentInput;
+import org.firas.wrap.repository.ComponentRepository;
 
 @Slf4j
 @Service
@@ -49,23 +57,34 @@ public class ComponentService {
                 new PageRequest(page - 1, size));
     }
 
-    public Page<Component> findComponents(int page, int size) {
+    public Page<Component> findComponents(PageInput input)
+            throws ValidationException {
         return componentRepository.findByStatusNot(
                 Component.STATUS_DELETED,
-                new PageRequest(page - 1, size));
+                input.toPageRequest(true));
     }
 
     @Transactional
-    public Component create(Component component) throws ComponentNameNotUniqueException {
-        component.setId(null);
+    public Component create(ComponentInput input)
+            throws ValidationException, ComponentNameNotUniqueException {
+        Map<String, IValidator> validators = new HashMap<>(1, 1f);
+        validators.put("name", nameValidator);
+        Component component = input.toComponent(validators);
         ensureNameUnique(component.getName());
+        component.setNumber(0);
         return componentRepository.save(component);
     }
 
     @Transactional
-    public Component update(Component component)
-            throws ComponentIdNotFoundException,
+    public Component update(ComponentInput input)
+            throws ValidationException,
+            ComponentIdNotFoundException,
             ComponentNameNotUniqueException {
+        Map<String, IValidator> validators = new HashMap<>(2, 1f);
+        validators.put("id", idValidator);
+        validators.put("name", nameValidator);
+        Component component = input.toComponent(validators);
+
         Component c = getById(component.getId());
         boolean changed = false;
         if (!c.getName().equals(component.getName())) {
@@ -79,9 +98,14 @@ public class ComponentService {
         return c;
     }
 
-
     @Transactional
-    public Component remove(Component component) throws ComponentIdNotFoundException {
+    public Component remove(ComponentInput input)
+            throws ValidationException,
+            ComponentIdNotFoundException {
+        Map<String, IValidator> validators = new HashMap<>(1, 1f);
+        validators.put("id", idValidator);
+        Component component = input.toComponent(validators);
+
         Component c = getById(component.getId());
         if (!c.isStatusDeleted()) {
             c.statusDeleted();
@@ -96,4 +120,15 @@ public class ComponentService {
             throw new ComponentNameNotUniqueException(name, "名称为" + name + "的零部件已存在");
         } catch (ComponentNameNotFoundException ex) {}
     }
+
+    private static final String ID_MESSAGE = "零部件的ID必须是一个正整数";
+    private static final IntegerValidator idValidator = new IntegerValidator(
+            ID_MESSAGE, 1, null, ID_MESSAGE, ID_MESSAGE);
+
+    private static final String NAME_MIN_MESSAGE = "零部件的名称至少两个字符";
+    private static final String NAME_MAX_MESSAGE =
+            "零部件的名称最多" + Component.NAME_MAX_LENGTH + "个字符";
+    private static final StringValidator nameValidator = new StringValidator(
+            Component.NAME_MAX_LENGTH, NAME_MAX_MESSAGE,
+            Component.NAME_MIN_LENGTH, NAME_MIN_MESSAGE);
 }

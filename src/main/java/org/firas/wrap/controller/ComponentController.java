@@ -1,6 +1,10 @@
 package org.firas.wrap.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.firas.common.request.PageInput;
+import org.firas.common.response.input.JsonResponseInvalidInput;
+import org.firas.common.validator.ValidationException;
+import org.firas.wrap.input.ComponentInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,13 +40,14 @@ public class ComponentController extends RequestController {
 
     @RequestMapping(method = RequestMethod.GET)
     public JsonResponse listAllComponents(
-            int page,
-            int size
+            PageInput input
     ) {
         try {
-            Page<Component> result = componentService.findComponents(page, size);
+            Page<Component> result = componentService.findComponents(input);
             return new JsonResponseSuccess("查询零部件列表成功",
                     parsePage(result, componentParser));
+        } catch (ValidationException ex) {
+            return ex.toResponse();
         } catch (Exception ex) {
             return new JsonResponseFailUndefined("查询零部件列表失败",
                     ex.getMessage());
@@ -51,12 +56,14 @@ public class ComponentController extends RequestController {
 
     @RequestMapping(method = RequestMethod.POST)
     public JsonResponse createComponent(
-            Component component
+            ComponentInput input
     ) {
         try {
-            component = componentService.create(component);
+            Component component = componentService.create(input);
             return new JsonResponseSuccess("添加零部件成功",
                     componentParser.parse(component));
+        } catch (ValidationException ex) {
+            return ex.toResponse();
         } catch (ComponentNameNotUniqueException ex) {
             return new JsonResponseNameOccupied(ex.getMessage());
         } catch (Exception ex) {
@@ -67,12 +74,14 @@ public class ComponentController extends RequestController {
 
     @RequestMapping(method = RequestMethod.PATCH)
     public JsonResponse updateComponent(
-            Component component
+            ComponentInput input
     ) {
         try {
-            component = componentService.update(component);
+            Component component = componentService.update(input);
             return new JsonResponseSuccess("修改零部件成功",
                     componentParser.parse(component));
+        } catch (ValidationException ex) {
+            return ex.toResponse();
         } catch (ComponentIdNotFoundException ex) {
             return new JsonResponseNotFound(ex.getMessage());
         } catch (ComponentNameNotUniqueException ex) {
@@ -85,12 +94,14 @@ public class ComponentController extends RequestController {
 
     @RequestMapping(method = RequestMethod.DELETE)
     public JsonResponse removeComponent(
-            Component component
+            ComponentInput input
     ) {
         try {
-            component = componentService.remove(component);
+            Component component = componentService.remove(input);
             return new JsonResponseSuccess("删除零部件成功",
                     component.getStatusInfo());
+        } catch (ValidationException ex) {
+            return ex.toResponse();
         } catch (ComponentIdNotFoundException ex) {
             return new JsonResponseNotFound(ex.getMessage());
         } catch (Exception ex) {

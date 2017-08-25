@@ -18,8 +18,8 @@ public class InputValidation {
 
     public InputValidation(String inputValue) {
         originalValue = inputValue;
-        validators = new LinkedList<IValidator>();
-        errors = new LinkedList<ValidationError>();
+        validators = new LinkedList<>();
+        errors = new LinkedList<>();
     }
 
     public InputValidation(String inputValue, IValidator validator) {
@@ -29,6 +29,9 @@ public class InputValidation {
 
 
     public InputValidation addValidator(IValidator validator) {
+        if (null == validator) {
+            throw new NullPointerException("\"validator\" cannot be null");
+        }
         validators.add(validator);
         return this;
     }
