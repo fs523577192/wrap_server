@@ -125,7 +125,8 @@ public class ComponentService {
     private static final IntegerValidator idValidator = new IntegerValidator(
             ID_MESSAGE, 1, null, ID_MESSAGE, ID_MESSAGE);
 
-    private static final String NAME_MIN_MESSAGE = "零部件的名称至少两个字符";
+    private static final String NAME_MIN_MESSAGE =
+            "零部件的名称至少" + Component.NAME_MIN_LENGTH + "个字符";
     private static final String NAME_MAX_MESSAGE =
             "零部件的名称最多" + Component.NAME_MAX_LENGTH + "个字符";
     private static final StringValidator nameValidator = new StringValidator(
