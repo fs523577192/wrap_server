@@ -1,12 +1,20 @@
 package org.firas.wrap.service;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.firas.common.request.PageInput;
+import org.firas.common.validator.IValidator;
+import org.firas.common.validator.ValidationException;
+import org.firas.wrap.input.BoxInput;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
+import org.firas.common.validator.IntegerValidator;
+import org.firas.common.validator.StringValidator;
 import org.firas.wrap.repository.BoxRepository;
 import org.firas.wrap.entity.Box;
 import org.firas.wrap.datatype.BoxIdNotFoundException;
@@ -40,24 +48,59 @@ public class BoxService {
         return box;
     }
 
-    public List<Box> findByNameContaining(String name) {
+    public Page<Box> findByNameContaining(String name, PageInput input)
+            throws ValidationException {
         return boxRepository.findByNameContainingAndStatus(
-                name, Box.STATUS_DELETED);
+                name, Box.STATUS_NORMAL, input.toPageRequest(true));
+    }
+
+    public Page<Box> findUsedByNameContaining(String name, PageInput input)
+            throws ValidationException {
+        return boxRepository.findByNameContainingAndStatus(
+                name, Box.STATUS_USED, input.toPageRequest(true));
+    }
+
+    public Page<Box> findBoxs(PageInput input)
+            throws ValidationException {
+        return boxRepository.findByStatus(
+                Box.STATUS_NORMAL,
+                input.toPageRequest(true));
+    }
+
+    public Page<Box> findUsedBoxs(PageInput input)
+            throws ValidationException {
+        return boxRepository.findByStatus(
+                Box.STATUS_USED,
+                input.toPageRequest(true));
     }
 
     @Transactional
-    public Box create(Box box) throws BoxNameNotUniqueException {
+    public Box create(BoxInput input)
+            throws ValidationException,
+            BoxNameNotUniqueException {
+        Map<String, IValidator> validators = new HashMap<>(1, 1f);
+        validators.put("name", nameValidator);
+        Box box = input.toBox(validators);
         box.setId(null);
         ensureNameUnique(box.getName());
         return boxRepository.save(box);
     }
 
     @Transactional
-    public Box update(Box box) throws BoxIdNotFoundException {
+    public Box update(BoxInput input)
+            throws ValidationException,
+            BoxIdNotFoundException,
+            BoxNameNotUniqueException {
+        Map<String, IValidator> validators = new HashMap<>(2, 1f);
+        validators.put("id", idValidator);
+        validators.put("name", nameValidator);
+        Box box = input.toBox(validators);
+
         Box b = getById(box.getId());
         boolean changed = false;
         if (!b.getName().equals(box.getName())) {
             changed = true;
+            ensureNameUnique(box.getName());
             b.setName(box.getName());
         }
         if (changed) {
@@ -66,9 +109,30 @@ public class BoxService {
         return b;
     }
 
+    @Transactional
+    public Box use(BoxInput input)
+            throws ValidationException,
+            BoxIdNotFoundException {
+        Map<String, IValidator> validators = new HashMap<>(1, 1f);
+        validators.put("id", idValidator);
+        Box box = input.toBox(validators);
+
+        Box b = getById(box.getId());
+        if (!b.isStatusUsed()) {
+            b.statusUsed();
+            return boxRepository.save(b);
+        }
+        return b;
+    }
 
     @Transactional
-    public Box remove(Box box) throws BoxIdNotFoundException {
+    public Box remove(BoxInput input)
+            throws ValidationException,
+            BoxIdNotFoundException {
+        Map<String, IValidator> validators = new HashMap<>(1, 1f);
+        validators.put("id", idValidator);
+        Box box = input.toBox(validators);
+
         Box b = getById(box.getId());
         if (!b.isStatusDeleted()) {
             b.statusDeleted();
@@ -83,4 +147,16 @@ public class BoxService {
             throw new BoxNameNotUniqueException(name, "名称为" + name + "的出货箱已存在");
         } catch (BoxNameNotFoundException ex) {}
     }
+
+    private static final String ID_MESSAGE = "出货箱的ID必须是一个正整数";
+    private static final IntegerValidator idValidator = new IntegerValidator(
+            ID_MESSAGE, 1, null, ID_MESSAGE, ID_MESSAGE);
+
+    private static final String NAME_MIN_MESSAGE =
+            "出货箱的名称至少" + Box.NAME_MIN_LENGTH + "个字符";
+    private static final String NAME_MAX_MESSAGE =
+            "出货箱的名称最多" + Box.NAME_MAX_LENGTH + "个字符";
+    private static final StringValidator nameValidator = new StringValidator(
+            Box.NAME_MAX_LENGTH, NAME_MAX_MESSAGE,
+            Box.NAME_MIN_LENGTH, NAME_MIN_MESSAGE);
 }

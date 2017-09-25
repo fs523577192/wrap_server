@@ -10,7 +10,7 @@ public interface ComponentRepository extends JpaRepository<Component, Integer> {
 
     Component findFirstByNameAndStatusNot(String name, byte status);
 
-    Page<Component> findByNameContainingAndStatus(
+    Page<Component> findByNameContainingAndStatusNot(
             String name, byte status, Pageable pageable);
 
     Page<Component> findByStatusNot(byte status, Pageable pageable);

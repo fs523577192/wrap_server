@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.firas.common.request.PageInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,11 +49,11 @@ public class ComponentService {
         return component;
     }
 
-    public Page<Component> findByNameContaining(
-            String name, int page, int size) {
-        return componentRepository.findByNameContainingAndStatus(
+    public Page<Component> findByNameContaining(String name, PageInput input)
+            throws ValidationException {
+        return componentRepository.findByNameContainingAndStatusNot(
                 name, Component.STATUS_DELETED,
-                new PageRequest(page - 1, size));
+                input.toPageRequest(true));
     }
 
     public Page<Component> findComponents(PageInput input)
@@ -70,6 +69,7 @@ public class ComponentService {
         Map<String, IValidator> validators = new HashMap<>(1, 1f);
         validators.put("name", nameValidator);
         Component component = input.toComponent(validators);
+        component.setId(null);
         ensureNameUnique(component.getName());
         component.setNumber(0);
         return componentRepository.save(component);
