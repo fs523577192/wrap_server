@@ -36,6 +36,7 @@ public class Component extends org.firas.common.model.IdModel {
         options.put("create_time_info", DateTimeHelper.getDateTimeFormatter());
         HashMap<String, Object> map = toMap(options);
         map.put("name", name);
+        map.put("unit", unit);
         return map;
     }
 
@@ -53,4 +54,15 @@ public class Component extends org.firas.common.model.IdModel {
     public static final int NUMBER_MIN = 0, NUMBER_MAX = Integer.MAX_VALUE;
     @Column(nullable = false)
     @Getter @Setter private int number = 0;
+
+    public static final int UNIT_MIN_LENGTH = 1, UNIT_MAX_LENGTH = 10;
+    @Column(length = UNIT_MAX_LENGTH)
+    @Getter private String unit;
+    public Component setUnit(String unit) {
+        this.unit = null == unit ? null : unit.trim();
+        if (null != this.unit && this.unit.length() <= 0) {
+            this.unit = null;
+        }
+        return this;
+    }
 }

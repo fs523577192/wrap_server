@@ -11,7 +11,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class StringStringMapValidator extends Validator {
+public class StringStringMapValidator extends Validator<Map<String, String>> {
 
     @Getter @Setter protected String message;
 
@@ -23,7 +23,7 @@ public class StringStringMapValidator extends Validator {
     protected String code = CODE;
 
 
-    protected Map<String, String> converted;
+    @Getter protected Map<String, String> converted;
 
 
     protected static final TypeReference<Map<String, String>>
@@ -42,10 +42,6 @@ public class StringStringMapValidator extends Validator {
 
     public boolean convertType() {
         return true;
-    }
-
-    public Object getConverted() {
-        return converted;
     }
 
     public boolean validate(String str) {

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import lombok.Getter;
 import lombok.Setter;
 
-public class IntegerListValidator extends Validator {
+public class IntegerListValidator extends Validator<List<Integer>> {
 
     @Getter @Setter
     protected Integer min, max, minLength, maxLength;
@@ -15,7 +15,7 @@ public class IntegerListValidator extends Validator {
                     messageMin, messageMax,
                     messageMinLength, messageMaxLength;
 
-    protected List<Integer> converted;
+    @Getter protected List<Integer> converted;
 
     protected static final String
             DEFAULT_MESSAGE = "The input is not a list of integers",
@@ -78,20 +78,11 @@ public class IntegerListValidator extends Validator {
         this.converted = null;
     }
 
-
-    public boolean convertType() {
-        return true;
-    }
-
-    public Object getConverted() {
-        return converted;
-    }
-
     /**
      * Checks whether str represents an integer
      * (optionally with minimum or maximum constraints)
      *
-     * @param  String str  the string to be validated
+     * @param  str  the string to be validated
      * @return boolean  true if str represents an integer,
      *                  false if the str is invalid
      */

@@ -5,11 +5,11 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class IntegerValidator extends Validator {
+public class IntegerValidator extends Validator<Integer> {
 
     @Getter @Setter protected Integer min, max;
     @Getter @Setter protected String message, messageMin, messageMax;
-    protected Integer converted;
+    @Getter protected Integer converted;
 
     protected static final String
             DEFAULT_MESSAGE = "The input is not a string of an integer",
@@ -53,19 +53,11 @@ public class IntegerValidator extends Validator {
     }
 
 
-    public boolean convertType() {
-        return true;
-    }
-
-    public Object getConverted() {
-        return converted;
-    }
-
     /**
      * Checks whether str represents an integer
      * (optionally with minimum or maximum constraints)
      *
-     * @param  String str  the string to be validated
+     * @param  str  the string to be validated
      * @return boolean  true if str represents an integer,
      *                  false if the str is invalid
      */

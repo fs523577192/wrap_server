@@ -9,12 +9,13 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class InputValidation {
+public class InputValidation<T> {
 
     @Getter protected String originalValue;
-    @Getter protected Object newValue;
-    @Getter protected List<IValidator> validators;
-    @Getter protected List<ValidationError> errors;
+    @Getter protected T newValue;
+
+    protected List<IValidator<T>> validators;
+    protected List<ValidationError> errors;
 
     public InputValidation(String inputValue) {
         originalValue = inputValue;
@@ -22,13 +23,13 @@ public class InputValidation {
         errors = new LinkedList<>();
     }
 
-    public InputValidation(String inputValue, IValidator validator) {
+    public InputValidation(String inputValue, IValidator<T> validator) {
         this(inputValue);
         addValidator(validator);
     }
 
 
-    public InputValidation addValidator(IValidator validator) {
+    public InputValidation addValidator(IValidator<T> validator) {
         if (null == validator) {
             throw new NullPointerException("\"validator\" cannot be null");
         }
@@ -36,25 +37,30 @@ public class InputValidation {
         return this;
     }
 
+    public List<IValidator<T>> getValidators() {
+        return validators;
+    }
+
+    public List<ValidationError> getErrors() {
+        return errors;
+    }
+
     public boolean validate(boolean onlyOneError) {
         boolean result = true;
         if (onlyOneError) {
-            for (IValidator validator : validators) {
+            for (IValidator<T> validator : validators) {
                 validator.setOnlyOneError(true);
                 if (validator.validate(originalValue)) {
-                    newValue = validator.convertType() ?
-                            validator.getConverted() : originalValue;
-                    newValue = null == newValue ? originalValue : newValue;
+                    newValue = validator.getConverted();
                 } else {
                     errors.addAll(validator.getErrors());
                     return false;
                 }
             }
         } else {
-            for (IValidator validator : validators) {
+            for (IValidator<T> validator : validators) {
                 if (validator.validate(originalValue)) {
-                    newValue = validator.convertType() ?
-                            validator.getConverted() : originalValue;
+                    newValue = validator.getConverted();
                 } else {
                     errors.addAll(validator.getErrors());
                     result = false;

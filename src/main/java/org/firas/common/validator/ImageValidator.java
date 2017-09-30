@@ -46,14 +46,10 @@ public class ImageValidator {
         return this;
     }
 
-    public boolean convertType() {
-        return true;
-    }
-
     /**
      * Checks whether file is an image in a supported format
      *
-     * @param  MultipartFile file  the file to be validated
+     * @param  file  the file to be validated
      * @return boolean  true if file is an image supported,
      *                  false if the file is not an image or
      *                  the image is in an unsupported format

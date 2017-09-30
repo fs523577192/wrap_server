@@ -2,6 +2,7 @@ package org.firas.wrap.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
 import org.firas.common.request.PageInput;
@@ -66,8 +67,9 @@ public class ComponentService {
     @Transactional
     public Component create(ComponentInput input)
             throws ValidationException, ComponentNameNotUniqueException {
-        Map<String, IValidator> validators = new HashMap<>(1, 1f);
+        Map<String, IValidator> validators = new HashMap<>(2, 1f);
         validators.put("name", nameValidator);
+        validators.put("unit", unitValidator);
         Component component = input.toComponent(validators);
         component.setId(null);
         ensureNameUnique(component.getName());
@@ -80,9 +82,10 @@ public class ComponentService {
             throws ValidationException,
             ComponentIdNotFoundException,
             ComponentNameNotUniqueException {
-        Map<String, IValidator> validators = new HashMap<>(2, 1f);
+        Map<String, IValidator> validators = new HashMap<>(3, 1f);
         validators.put("id", idValidator);
         validators.put("name", nameValidator);
+        validators.put("unit", unitValidator);
         Component component = input.toComponent(validators);
 
         Component c = getById(component.getId());
@@ -91,6 +94,10 @@ public class ComponentService {
             changed = true;
             ensureNameUnique(component.getName());
             c.setName(component.getName());
+        }
+        if (!Objects.equals(c.getUnit(), component.getUnit())) {
+            changed = true;
+            c.setUnit(component.getUnit());
         }
         if (changed) {
             return componentRepository.save(c);
@@ -132,4 +139,11 @@ public class ComponentService {
     private static final StringValidator nameValidator = new StringValidator(
             Component.NAME_MAX_LENGTH, NAME_MAX_MESSAGE,
             Component.NAME_MIN_LENGTH, NAME_MIN_MESSAGE);
+
+    private static final String UNIT_MAX_MESSAGE =
+            "数量单位最多" + Component.UNIT_MAX_LENGTH + "个字符";
+    private static final StringValidator unitValidator = new StringValidator(
+            Component.UNIT_MAX_LENGTH, UNIT_MAX_MESSAGE,
+            null, null);
+
 }

@@ -5,26 +5,29 @@ import java.util.LinkedList;
 import lombok.Getter;
 import lombok.Setter;
 
-public abstract class Validator implements IValidator {
+public abstract class Validator<T> implements IValidator<T> {
 
     @Getter protected boolean onlyOneError;
-    @Getter protected List<ValidationError> errors;
+
+    protected List<ValidationError> errors;
 
     public Validator() {
         onlyOneError = false;
-        errors = new LinkedList<ValidationError>();
+        errors = new LinkedList<>();
     }
 
-    public IValidator setOnlyOneError(boolean onlyOneError) {
+    @Override
+    public IValidator<T> setOnlyOneError(boolean onlyOneError) {
         this.onlyOneError = onlyOneError;
         return this;
     }
 
-    public boolean convertType() {
-        return false;
+    @Override
+    public List<ValidationError> getErrors() {
+        return errors;
     }
 
-    public Object getConverted() {
+    public T getConverted() {
         return null;
     }
 

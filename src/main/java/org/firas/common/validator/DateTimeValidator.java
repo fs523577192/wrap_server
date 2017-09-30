@@ -8,7 +8,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class DateTimeValidator extends Validator {
+public class DateTimeValidator extends Validator<Date> {
 
     @Getter @Setter protected Date min, max;
     @Getter @Setter protected String message, messageMin, messageMax;
@@ -29,7 +29,7 @@ public class DateTimeValidator extends Validator {
             codeMax = CODE_MAX;
 
 
-    protected Date converted;
+    @Getter protected Date converted;
     protected SimpleDateFormat formatter;
 
 
@@ -60,15 +60,6 @@ public class DateTimeValidator extends Validator {
         this.max = max;
         this.messageMax = messageMax;
         this.converted = null;
-    }
-
-
-    public boolean convertType() {
-        return true;
-    }
-
-    public Object getConverted() {
-        return converted;
     }
 
     public void setPattern(String pattern) {

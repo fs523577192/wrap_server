@@ -3,12 +3,12 @@ package org.firas.common.validator;
 import lombok.Getter;
 import lombok.Setter;
 
-public class FloatValidator extends Validator {
+public class FloatValidator extends Validator<Float> {
 
     @Getter @Setter protected Float min, max;
     @Getter @Setter protected boolean includeMin, includeMax;
     @Getter @Setter protected String message, messageMin, messageMax;
-    protected Float converted;
+    @Getter protected Float converted;
 
     protected static final String
             DEFAULT_MESSAGE = "The input is not a string of a " +
@@ -62,20 +62,11 @@ public class FloatValidator extends Validator {
         this.converted = null;
     }
 
-
-    public boolean convertType() {
-        return true;
-    }
-
-    public Object getConverted() {
-        return converted;
-    }
-
     /**
      * Checks whether str represents a sinle-precision floating point number
      * (optionally with minimum or maximum constraints)
      *
-     * @param  String str  the string to be validated
+     * @param  str  the string to be validated
      * @return boolean  true if str represents a floating point number,
      *                  false if the str is invalid
      */
@@ -97,8 +88,7 @@ public class FloatValidator extends Validator {
                 }
             }
             return result;
-        } catch (NullPointerException e) {
-        } catch (NumberFormatException e) {
+        } catch (NullPointerException | NumberFormatException e) {
         }
         this.errors.add(new ValidationError(code, message));
         return false;

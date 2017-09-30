@@ -67,33 +67,33 @@ public abstract class RequestController extends ResponseController {
 
     protected boolean isFromBrowser(HttpServletRequest request) {
         String userAgent = getUserAgent(request);
-        return null != userAgent && userAgent.indexOf("Mozilla") >= 0;
+        return null != userAgent && userAgent.contains("Mozilla");
     }
 
     protected boolean isFromWeixinBrowser(HttpServletRequest request) {
         String userAgent = getUserAgent(request);
-        return null != userAgent && userAgent.indexOf("MicroMessenger") >= 0;
+        return null != userAgent && userAgent.contains("MicroMessenger");
     }
 
     protected boolean isFromAndroid(HttpServletRequest request) {
         String userAgent = getUserAgent(request);
-        return null != userAgent && userAgent.indexOf("Android") >= 0;
+        return null != userAgent && userAgent.contains("Android");
     }
 
     protected boolean isFromIos(HttpServletRequest request) {
         String userAgent = getUserAgent(request);
-        return null != userAgent && (userAgent.indexOf("iPhone") >= 0 ||
-                userAgent.indexOf("iPad") >= 0);
+        return null != userAgent && (userAgent.contains("iPhone") ||
+                userAgent.contains("iPad"));
     }
 
 
     protected JsonResponseInvalidInput validateInput(
-            Map<String, InputValidation> inputs, boolean onlyOneError) {
+            Map<String, InputValidation<?>> inputs, boolean onlyOneError) {
         JsonResponseInvalidInput result = null;
         if (onlyOneError) {
-            for (Map.Entry<String, InputValidation> entry :
+            for (Map.Entry<String, InputValidation<?>> entry :
                     inputs.entrySet()) {
-                InputValidation validation = entry.getValue();
+                InputValidation<?> validation = entry.getValue();
                 if (!validation.validate(true)) {
                     List<ValidationError> errors = validation.getErrors();
                     if (errors.size() < 1) {
@@ -105,7 +105,7 @@ public abstract class RequestController extends ResponseController {
                 }
             }
         } else {
-            for (Map.Entry<String, InputValidation> entry :
+            for (Map.Entry<String, InputValidation<?>> entry :
                     inputs.entrySet()) {
                 InputValidation validation = entry.getValue();
                 if (!validation.validate(false)) {
@@ -151,94 +151,4 @@ public abstract class RequestController extends ResponseController {
         return new JsonResponseInvalidInput(message, message, errorMap);
     }
 
-    protected Map<String, InputValidation> checkOperatorId(String operatorId) {
-        Map<String, InputValidation> inputs =
-                new LinkedHashMap<String, InputValidation>();
-        if (null != operatorId) {
-            inputs.put("operator_id", new InputValidation(operatorId,
-                    new IntegerValidator("操作者用户ID必须是一个正整数",
-                            1, null, "操作者用户ID必须是一个正整数",
-                            "操作者用户ID必须是一个正整数")));
-        }
-        return inputs;
-    }
-
-    protected void getOperatorUserId(Map<String, InputValidation> inputs,
-            String operatorId, MutableInteger operatorUserId) {
-        if (null != operatorId) {
-            Object temp = inputs.get("operator_id").getNewValue();
-            operatorUserId.setValue(Integer.class.cast(temp));
-        }
-    }
-
-
-    protected void checkPageAndSize(Map<String, InputValidation> inputs,
-            String page, String size) {
-        if (null == page) page = "1";
-        if (null == size) size = "10";
-
-        inputs.put("page", new InputValidation(page,
-                new IntegerValidator("页码必须是一个正整数",
-                        1, null, "页码必须是一个正整数",
-                        "页码必须是一个正整数")));
-        inputs.put("size", new InputValidation(size,
-                new IntegerValidator("每页项目数必须是一个正整数",
-                        1, null, "每页项目数必须是一个正整数",
-                        "每页项目数必须是一个正整数")));
-    }
-
-    @SuppressWarnings("unchecked")
-    protected void getPageAndSize(Map<String, InputValidation> inputs,
-            MutableInteger page, MutableInteger size) {
-        this.getConvertedInputValue(inputs, "page", page, false);
-        this.getConvertedInputValue(inputs, "size", size, false);
-    }
-
-
-    protected void getConvertedInputValue(Map<String, InputValidation> inputs,
-            String key, MutableInteger output, boolean canBeNull) {
-        InputValidation validation = inputs.get(key);
-        if (!canBeNull || null != validation) {
-            Object temp = validation.getNewValue();
-            output.setValue(Integer.class.cast(temp));
-        }
-    }
-
-    protected void getConvertedInputValue(Map<String, InputValidation> inputs,
-            String key, Date output, boolean canBeNull) {
-        InputValidation validation = inputs.get(key);
-        if (!canBeNull || null != validation) {
-            Object temp = validation.getNewValue();
-            output.setTime( Date.class.cast(temp).getTime() );
-        }
-    }
-
-    protected void getConvertedInputValue(Map<String, InputValidation> inputs,
-            String key, Calendar output, boolean canBeNull) {
-        InputValidation validation = inputs.get(key);
-        if (!canBeNull || null != validation) {
-            Object temp = validation.getNewValue();
-            output.setTime(Date.class.cast(temp));
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <T> void getConvertedInputValue(Map<String, InputValidation> inputs,
-            String key, Collection<T> output, boolean canBeNull) {
-        InputValidation validation = inputs.get(key);
-        if (!canBeNull || null != validation) {
-            Object temp = validation.getNewValue();
-            output.addAll((Collection<T>)temp);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <K, V> void getConvertedInputValue(Map<String, InputValidation> inputs,
-            String key, Map<K, V> output, boolean canBeNull) {
-        InputValidation validation = inputs.get(key);
-        if (!canBeNull || null != validation) {
-            Object temp = validation.getNewValue();
-            output.putAll((Map<K, V>)temp);
-        }
-    }
 }

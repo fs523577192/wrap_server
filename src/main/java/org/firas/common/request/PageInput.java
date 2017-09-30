@@ -27,16 +27,16 @@ public class PageInput {
 
     public PageRequest toPageRequest(boolean onlyOneError)
             throws ValidationException {
-        InputValidation pageValidation = new InputValidation(page, pageValidator);
-        InputValidation sizeValidation = new InputValidation(size, sizeValidator);
+        InputValidation<Integer> pageValidation = new InputValidation<>(page, pageValidator);
+        InputValidation<Integer> sizeValidation = new InputValidation<>(size, sizeValidator);
         if (!pageValidation.validate(onlyOneError)) {
             throw new ValidationException(pageValidation.getErrors());
         }
         if (!sizeValidation.validate(onlyOneError)) {
             throw new ValidationException(sizeValidation.getErrors());
         }
-        int pageValue = Integer.class.cast(pageValidation.getNewValue());
-        int sizeValue = Integer.class.cast(sizeValidation.getNewValue());
+        int pageValue = pageValidation.getNewValue();
+        int sizeValue = sizeValidation.getNewValue();
         return new PageRequest(pageValue - 1, sizeValue);
     }
 }

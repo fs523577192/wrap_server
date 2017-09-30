@@ -5,10 +5,11 @@ import java.util.regex.Matcher;
 import lombok.Getter;
 import lombok.Setter;
 
-public class StringValidator extends Validator {
+public class StringValidator extends Validator<String> {
 
 	@Getter protected Integer maxLength, minLength;
 	protected Pattern pattern;
+	@Getter protected String converted = null;
 
 	@Getter @Setter protected String messageMax, messageMin, messagePattern;
     protected static final String
@@ -116,6 +117,9 @@ public class StringValidator extends Validator {
                         codePattern, messagePattern));
                 return false;
             }
+        }
+        if (result) {
+            converted = str;
         }
         return result;
     }

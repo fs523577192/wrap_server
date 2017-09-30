@@ -6,7 +6,7 @@ import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
 
-public class DomainValidator extends Validator {
+public class DomainValidator extends Validator<String> {
 
     @Getter @Setter protected String[] domain;
     @Getter @Setter protected String message;
@@ -17,7 +17,7 @@ public class DomainValidator extends Validator {
     public static final String CODE = "Domain";
 
     protected String code = CODE;
-
+    @Getter protected String converted = null;
 
     public DomainValidator(int[] domain) {
         this(domain, DEFAULT_MESSAGE);
@@ -81,13 +81,14 @@ public class DomainValidator extends Validator {
      * Checks whether str represents an integer
      * (optionally with minimum or maximum constraints)
      *
-     * @param  String str  the string to be validated
+     * @param  str  the string to be validated
      * @return boolean  true if str represents a value in the specific array,
      *                  false if the str is not in the array
      */
     public boolean validate(String str) {
-        for (int i = 0; i < domain.length; ++i) {
-            if (Objects.equals(str, domain[i])) {
+        for (String item : domain) {
+            if (Objects.equals(str, item)) {
+                converted = str;
                 return true;
             }
         }
