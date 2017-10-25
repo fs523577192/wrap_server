@@ -8,15 +8,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
-import com.aliyuncs.DefaultAcsClient;
-import com.aliyuncs.IAcsClient;
-import com.aliyuncs.exceptions.ClientException;
-import com.aliyuncs.exceptions.ServerException;
-import com.aliyuncs.profile.DefaultProfile;
-import com.aliyuncs.profile.IClientProfile;
-import com.aliyuncs.sms.model.v20160927.SingleSendSmsRequest;
-import com.aliyuncs.sms.model.v20160927.SingleSendSmsResponse;
-
 import com.aliyun.mns.client.*;
 import com.aliyun.mns.model.*;
 import com.aliyun.mns.common.ServiceException;
@@ -58,34 +49,6 @@ public class AliyunService {
         return new AliyunTemplateAndApp(app, aliyunApp,
                 template, aliyunTemplate);
     }
-
-    /*
-    public Sms sendSms(AliyunTemplate aliyunTemplate, String mobile,
-            Map<String, String> contentMap, Map<String, Object> extraMap,
-            String ip, String userAgent, Integer userId) throws Exception {
-        AliyunTemplateAndApp info = getAliyunAppByAliyunTemplate(aliyunTemplate);
-        AliyunApp aliyunApp = info.getAliyunApp();
-
-        IClientProfile profile = DefaultProfile.getProfile(
-                aliyunApp.getEndPoint(), aliyunApp.getAppId(),
-                aliyunApp.getAppSecret());
-        String content = new ObjectMapper().writeValueAsString(contentMap);
-
-        DefaultProfile.addEndpoint(aliyunApp.getEndPoint(),
-                aliyunApp.getEndPoint(), "Sms", aliyunApp.getUrl());
-        IAcsClient client = new DefaultAcsClient(profile);
-        SingleSendSmsRequest request = new SingleSendSmsRequest();
-        request.setSignName(aliyunTemplate.getSignName());
-        request.setTemplateCode(aliyunTemplate.getCode());
-        request.setParamString(content);
-        request.setRecNum(mobile);
-        SingleSendSmsResponse response = client.getAcsResponse(request);
-
-        return smsService.createSms(info.getTemplate(), mobile, content,
-                new ObjectMapper().writeValueAsString(extraMap),
-                ip, userAgent, userId);
-    }
-    */
 
     public Sms sendSms(
             AliyunTemplate aliyunTemplate, String mobile,

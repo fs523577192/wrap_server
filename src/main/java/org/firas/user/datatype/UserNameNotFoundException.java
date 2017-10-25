@@ -2,8 +2,7 @@ package org.firas.user.datatype;
 
 import lombok.Getter;
 
-public class UserNameNotFoundException
-        extends org.apache.shiro.authc.UnknownAccountException {
+public class UserNameNotFoundException extends Exception {
 
     @Getter private String userName;
 
