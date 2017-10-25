@@ -26,6 +26,10 @@ public class Component extends org.firas.common.model.IdModel {
     @Transient
     private static final long serialVersionUID = 1L;
 
+    public Component(Integer id) {
+        setId(id);
+    }
+
     public Component(String name) {
         setName(name);
     }

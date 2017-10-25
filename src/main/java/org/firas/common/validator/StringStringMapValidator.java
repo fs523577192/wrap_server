@@ -23,7 +23,7 @@ public class StringStringMapValidator extends Validator<Map<String, String>> {
     protected String code = CODE;
 
 
-    @Getter protected Map<String, String> converted;
+    protected Map<String, String> converted;
 
 
     protected static final TypeReference<Map<String, String>>
@@ -40,8 +40,8 @@ public class StringStringMapValidator extends Validator<Map<String, String>> {
     }
 
 
-    public boolean convertType() {
-        return true;
+    public Map<String, String> getConverted() {
+        return converted;
     }
 
     public boolean validate(String str) {

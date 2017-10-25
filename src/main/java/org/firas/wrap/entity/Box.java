@@ -49,4 +49,7 @@ public class Box extends org.firas.common.model.IdModel {
         }
         return this;
     }
+
+    @Transient
+    @Getter @Setter private Map<Integer, BoxComponent> components;
 }

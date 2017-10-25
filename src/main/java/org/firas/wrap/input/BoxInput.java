@@ -22,7 +22,7 @@ public class BoxInput {
 
     @Getter @Setter private String name;
 
-    @Getter @Setter private String componentIds;
+    @Getter @Setter private String components;
 
     @SuppressWarnings("unchecked")
     public Box toBox(Map<String, IValidator> validators)
@@ -46,14 +46,18 @@ public class BoxInput {
             }
             result.setName(validation.getNewValue());
         }
-        validator = validators.get("component_ids");
+        validator = validators.get("components");
         if (null != validator) {
-            InputValidation<List<Integer>> validation = new InputValidation<>(
-                    componentIds, (IValidator<List<Integer>>)validator);
+            InputValidation<Map<Integer, Integer>> validation = new InputValidation<>(
+                    components, (IValidator<Map<Integer, Integer>>)validator);
             if (!validation.validate(true)) {
                 throw new ValidationException(validation.getErrors());
             }
-            // TODO:
+            Map<Integer, Integer> temp = validation.getNewValue();
+            for (Map<Integer, Integer>.Entry entry : temp.entrySet()) {
+                Integer componentId = entry.getKey();
+                Integer number = entry.getValue();
+            }
         }
         return result;
     }
