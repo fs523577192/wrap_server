@@ -112,7 +112,7 @@ public class StringValidator extends Validator<String> {
             result = false;
         }
         if (null != pattern) {
-            if (null == str || !pattern.matcher(str).matches()) {
+            if (null == str || !pattern.matcher(str).find()) {
                 this.errors.add(new ValidationError(
                         codePattern, messagePattern));
                 return false;
