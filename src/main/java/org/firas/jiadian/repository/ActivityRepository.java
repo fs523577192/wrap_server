@@ -1,4 +1,4 @@
-package org.firas.wrap.repository;
+package org.firas.jiadian.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,4 +1,4 @@
-package org.firas.wrap.repository;
+package org.firas.jiadian.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,7 +9,9 @@ import org.firas.jiadian.entity.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Integer> {
 
-    Order findFirstByNameAndStatusNot(String name, byte status);
+    List<Order> findByMobileAndStatusNot(String mobile, byte status);
+    List<Order> findBySchoolIdCodeAndStatusNot(String schoolIdCode, byte status);
+    List<Order> findByPhoneAndStatusNot(String phone, byte status);
 
     Page<Order> findByNameContainingAndStatusNot(
             String name, byte status, Pageable pageable);

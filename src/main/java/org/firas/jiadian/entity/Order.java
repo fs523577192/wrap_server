@@ -14,27 +14,37 @@ import lombok.Setter;
  */
 @Entity
 @Table(name = "t_order")
-public class Order extends org.firas.common.model.StatusModel {
+public class Order extends org.firas.common.model.IdModel {
 
-    @Column
+    @Column(length = 11)
     @Getter @Setter private String mobile; // 物主手机
 
-    @Column
+    public static final int PHONE_MAX_LENGTH = 20;
+    @Column(length = PHONE_MAX_LENGTH)
     @Getter @Setter private String phone; // 物主固话
 
-    @Column
+    public static final int EMAIL_MAX_LENGTH = 60;
+    @Column(length = EMAIL_MAX_LENGTH)
     @Getter @Setter private String email; // 物主email
 
+    public static final int SCHOOL_IDCODE_MIN_LENGTH = 6;
+    public static final int SCHOOL_IDCODE_MAX_LENGTH = 15;
     @Column(name = "school_idcode")
     @Getter @Setter private String schoolIdCode; // 物主学号
 
-    @Column
+    public static final int OWNER_MIN_LENGTH = 2;
+    public static final int OWNER_MAX_LENGTH = 30;
+    @Column(nullable = false, length = OWNER_MAX_LENGTH)
     @Getter @Setter private String owner; // 物主
 
-    @Column
+    public static final int NAME_MIN_LENGTH = 2;
+    public static final int NAME_MAX_LENGTH = 100;
+    @Column(nullable = false, length = NAME_MAX_LENGTH)
     @Getter @Setter private String name; // 物品名称
 
-    @Column
+    public static final int WORKER_MIN_LENGTH = 2;
+    public static final int WORKER_MAX_LENGTH = 30;
+    @Column(length = WORKER_MAX_LENGTH)
     @Getter @Setter private String worker; // 接修人
 
     @Column

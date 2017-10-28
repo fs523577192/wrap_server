@@ -12,7 +12,7 @@ import lombok.Setter;
  */
 @Entity
 @Table(name = "t_jiadian_role")
-public class Role extends org.firas.common.model.StatusModel {
+public class Role extends org.firas.common.model.IdModel {
 
     @Column
     @Getter @Setter private String name;

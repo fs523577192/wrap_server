@@ -32,6 +32,8 @@ public class BoxComponent extends org.firas.common.model.IdModel {
 
     @Embeddable
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class BoxComponentId implements Serializable {
 
         @Column(name = "box_id")

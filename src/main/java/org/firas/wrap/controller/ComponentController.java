@@ -28,6 +28,7 @@ import org.firas.wrap.service.ComponentService;
  */
 @Slf4j
 @RestController
+@RequestMapping("/component")
 public class ComponentController extends RequestController {
 
     private ComponentService componentService;

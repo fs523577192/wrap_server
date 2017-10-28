@@ -54,7 +54,7 @@ public class BoxInput {
                 throw new ValidationException(validation.getErrors());
             }
             Map<Integer, Integer> temp = validation.getNewValue();
-            for (Map<Integer, Integer>.Entry entry : temp.entrySet()) {
+            for (Map.Entry<Integer, Integer> entry : temp.entrySet()) {
                 Integer componentId = entry.getKey();
                 Integer number = entry.getValue();
             }
