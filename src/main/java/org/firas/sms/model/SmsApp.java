@@ -13,11 +13,11 @@ import lombok.AllArgsConstructor;
 import org.firas.common.model.IdModel;
 
 @Entity
-@Table(name = "t_app")
+@Table(name = "t_sms_app")
 @NoArgsConstructor
-public class App extends IdModel {
+public class SmsApp extends IdModel {
 
-    public App(Sms.Provider provider, String name) {
+    public SmsApp(Sms.Provider provider, String name) {
         this.provider = provider;
         this.name = name;
     }

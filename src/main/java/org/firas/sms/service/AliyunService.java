@@ -14,11 +14,11 @@ import com.aliyun.mns.common.ServiceException;
 
 import org.firas.common.datatype.Triple;
 import org.firas.sms.model.AliyunApp;
-import org.firas.sms.model.App;
+import org.firas.sms.model.SmsApp;
 import org.firas.sms.model.AliyunTemplate;
 import org.firas.sms.model.Template;
 import org.firas.sms.model.Sms;
-import org.firas.sms.service.AppService;
+import org.firas.sms.service.SmsAppService;
 import org.firas.sms.service.SmsService;
 import org.firas.sms.datatype.AliyunTemplateAndApp;
 import org.firas.sms.datatype.SendFrequentlyException;
@@ -27,9 +27,9 @@ import org.firas.sms.datatype.SendFrequentlyException;
 @Service
 public class AliyunService {
 
-    private AppService appService;
+    private SmsAppService appService;
     @Autowired
-    public void setAppService(AppService appService) {
+    public void setAppService(SmsAppService appService) {
         this.appService = appService;
     }
 
@@ -42,7 +42,7 @@ public class AliyunService {
     public AliyunTemplateAndApp getAliyunAppByAliyunTemplate(
             AliyunTemplate aliyunTemplate) throws Exception {
         Template template = aliyunTemplate.getTemplate();
-        App app = template.getApp();
+        SmsApp app = template.getApp();
         AliyunApp aliyunApp = appService.getAliyunAppById(app.getId());
         if (null == aliyunApp) throw new Exception("The AliyunTemplate does not " +
                 "have a corresponding AliyunApp");
@@ -84,9 +84,9 @@ public class AliyunService {
 
         CloudAccount account = new CloudAccount(
                 aliyunApp.getAppId(), aliyunApp.getAppSecret(),
-                aliyunApp.getUrl());
+                aliyunApp.getEndPoint());
         MNSClient client = account.getMNSClient();
-        CloudTopic topic = client.getTopicRef(aliyunApp.getEndPoint()); // Topic
+        CloudTopic topic = client.getTopicRef(aliyunApp.getTopic());
         return new Triple<>(client, topic, info);
     }
 

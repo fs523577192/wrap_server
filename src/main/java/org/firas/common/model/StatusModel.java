@@ -18,7 +18,6 @@ public abstract class StatusModel extends TimeModel {
     public static final byte STATUS_INACTIVE = 6;
     public static final byte STATUS_USED = 7;
     public static final byte STATUS_EXPIRED = 8;
-    public static final byte STATUS_VERIFIED = 9;
 
     @Column(nullable = false)
     protected byte status = STATUS_NORMAL;
@@ -57,10 +56,6 @@ public abstract class StatusModel extends TimeModel {
 
     public boolean isStatusExpired() {
         return STATUS_EXPIRED == status;
-    }
-
-    public boolean isStatusVerified() {
-        return STATUS_VERIFIED == status;
     }
 
 
@@ -109,11 +104,6 @@ public abstract class StatusModel extends TimeModel {
         return this;
     }
 
-    public StatusModel statusVerified() {
-        status = STATUS_VERIFIED;
-        return this;
-    }
-
 
     public String getStatusInfo() {
         switch (status) {
@@ -135,12 +125,11 @@ public abstract class StatusModel extends TimeModel {
                 return "Used";
             case STATUS_EXPIRED:
                 return "Expired";
-            case STATUS_VERIFIED:
-                return "Verified";
         }
         return "Undefined";
     }
 
+    @Override
     public HashMap<String, Object> toMap(Map<String, Object> options) {
         HashMap<String, Object> result = super.toMap(options);
         if (TrueValueHelper.isTrue(options, "status")) {

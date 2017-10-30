@@ -13,13 +13,13 @@ import lombok.Setter;
 import org.firas.common.model.LogModel;
 
 @Entity
-@Table(name = "t_app_log")
+@Table(name = "t_sms_app_log")
 @DynamicUpdate
-public class AppLog extends LogModel {
+public class SmsAppLog extends LogModel {
     @Transient
     private static final long serialVersionUID = 1L;
 
-    public AppLog(Integer appId, Map<String, String> content, boolean isCreate,
+    public SmsAppLog(Integer appId, Map<String, String> content, boolean isCreate,
             String operatorIp, String userAgent, Integer operatorId)
             throws JsonProcessingException {
         super(appId, new ObjectMapper().writeValueAsString(content),

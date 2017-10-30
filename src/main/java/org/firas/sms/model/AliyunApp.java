@@ -22,19 +22,19 @@ public class AliyunApp extends StatusModel {
     @Transient
     private static final long serialVersionUID = 1L;
 
-    public AliyunApp(App app, String endPoint,
-            String appId, String appSecret, String url) {
+    public AliyunApp(SmsApp app, String appId, String appSecret,
+            String endPoint, String topic) {
         this.app = app;
-        this.endPoint = endPoint;
         this.appId = appId;
         this.appSecret = appSecret;
-        this.url = url;
+        this.endPoint = endPoint;
+        this.topic = topic;
     }
 
-    public AliyunApp(String name, String endPoint,
-            String appId, String appSecret, String url) {
-        this(new App(Sms.Provider.ALIYUN, name), endPoint,
-                appId, appSecret, url);
+    public AliyunApp(String name, String appId, String appSecret,
+            String endPoint, String topic) {
+        this(new SmsApp(Sms.Provider.ALIYUN, name), endPoint,
+                appId, appSecret, topic);
     }
 
     @Id
@@ -43,14 +43,11 @@ public class AliyunApp extends StatusModel {
 
     @OneToOne(fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn(name = "id")
-    @Getter private App app;
-    public void setApp(App app) {
+    @Getter private SmsApp app;
+    public void setApp(SmsApp app) {
         this.setId(app.getId());
         this.app = app;
     }
-
-    @Column(name = "end_point", nullable = false, length = 64)
-    @Getter @Setter private String endPoint; // new interface: topic
 
     @Column(name = "app_id", nullable = false, length = 64)
     @Getter @Setter private String appId;
@@ -58,17 +55,20 @@ public class AliyunApp extends StatusModel {
     @Column(name = "app_secret", nullable = false, length = 64)
     @Getter @Setter private String appSecret;
 
-    @Column(nullable = false)
-    @Getter @Setter private String url; // new interface: endpoint
+    @Column(name = "end_point", nullable = false)
+    @Getter @Setter private String endPoint;
+
+    @Column(nullable = false, length = 64)
+    @Getter @Setter private String topic;
 
     public HashMap<String, String> getMapForLog() {
         HashMap<String, String> map = this.getApp().getMapForLog();
         map.put("create_time", this.getCreateTimeInfo(null));
         map.put("update_time", this.getUpdateTimeInfo(null));
-        map.put("end_point", this.getEndPoint());
         map.put("app_id", this.getAppId());
         map.put("app_secret", this.getAppSecret());
-        map.put("url", this.getUrl());
+        map.put("end_point", this.getEndPoint());
+        map.put("topic", this.getTopic());
         return map;
     }
 }

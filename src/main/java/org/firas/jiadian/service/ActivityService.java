@@ -137,11 +137,7 @@ public class ActivityService {
     public Activity remove(ActivityInput input)
             throws ValidationException,
             ActivityIdNotFoundException {
-        Map<String, IValidator> validators = new HashMap<>(1, 1f);
-        validators.put("id", idValidator);
-        Activity activity = input.toActivity(validators);
-
-        Activity a = getById(activity.getId());
+        Activity a = getById(input);
         if (!a.isStatusDeleted()) {
             a.statusDeleted();
             return activityRepository.save(a);

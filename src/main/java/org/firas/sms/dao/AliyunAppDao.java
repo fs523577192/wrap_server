@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.firas.sms.model.AliyunApp;
-import org.firas.sms.model.App;
+import org.firas.sms.model.SmsApp;
 
 public interface AliyunAppDao extends PagingAndSortingRepository<AliyunApp, Integer> {
 

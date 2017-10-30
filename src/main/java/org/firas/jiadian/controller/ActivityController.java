@@ -29,7 +29,8 @@ import org.firas.jiadian.service.ActivityService;
  *
  */
 @Slf4j
-@RestController("/jiadian/activity")
+@RestController
+@RequestMapping("/jiadian/activity")
 public class ActivityController extends RequestController {
 
     private ActivityService activityService;

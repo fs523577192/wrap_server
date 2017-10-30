@@ -27,7 +27,7 @@ public class YunpianTemplate extends StatusModel {
         this.content = content;
     }
 
-    public YunpianTemplate(App app, String name, String content) {
+    public YunpianTemplate(SmsApp app, String name, String content) {
         this(new Template(app, name), content);
     }
 

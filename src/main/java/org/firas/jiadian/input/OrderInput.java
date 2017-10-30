@@ -34,6 +34,8 @@ public class OrderInput {
 
     @Getter @Setter private String name;
 
+    @Getter @Setter private String team;
+
     @Getter @Setter private String worker;
 
     @Getter @Setter private String reason;
@@ -68,6 +70,15 @@ public class OrderInput {
                 throw new ValidationException(validation.getErrors());
             }
             result.setName(validation.getNewValue());
+        }
+        validator = validators.get("team");
+        if (null != validator) {
+            InputValidation<String> validation = new InputValidation<>(
+                    team, (IValidator<String>)validator);
+            if (!validation.validate(true)) {
+                throw new ValidationException(validation.getErrors());
+            }
+            result.setTeam(validation.getNewValue());
         }
         validateOwner(validators, result);
         validateWork(validators, result);

@@ -22,13 +22,13 @@ public class YunpianApp extends StatusModel {
     @Transient
     private static final long serialVersionUID = 1L;
 
-    public YunpianApp(App app, String apiKey) {
+    public YunpianApp(SmsApp app, String apiKey) {
         this.app = app;
         this.apiKey = apiKey;
     }
 
     public YunpianApp(String name, String apiKey) {
-        this(new App(Sms.Provider.ALIYUN, name), apiKey);
+        this(new SmsApp(Sms.Provider.ALIYUN, name), apiKey);
     }
 
     @Id
@@ -37,8 +37,8 @@ public class YunpianApp extends StatusModel {
 
     @OneToOne(fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn(name = "id")
-    @Getter private App app;
-    public void setApp(App app) {
+    @Getter private SmsApp app;
+    public void setApp(SmsApp app) {
         this.setId(app.getId());
         this.app = app;
     }

@@ -19,7 +19,7 @@ import org.firas.common.model.IdModel;
 @NoArgsConstructor
 public class Template extends IdModel {
 
-    public Template(App app, String name) {
+    public Template(SmsApp app, String name) {
         this.app = app;
         this.provider = app.getProvider();
         this.name = name;
@@ -34,7 +34,7 @@ public class Template extends IdModel {
     
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "app_id", nullable = false)
-    @Getter @Setter private App app;
+    @Getter @Setter private SmsApp app;
     
     public HashMap<String, String> getMapForLog() {
         HashMap<String, String> map = new HashMap<String, String>();

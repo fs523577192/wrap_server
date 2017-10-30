@@ -28,7 +28,7 @@ public class AliyunTemplate extends StatusModel {
         this.code = code;
     }
 
-    public AliyunTemplate(App app, String name, String signName, String code) {
+    public AliyunTemplate(SmsApp app, String name, String signName, String code) {
         this(new Template(app, name), signName, code);
     }
 

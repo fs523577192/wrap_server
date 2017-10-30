@@ -1,5 +1,6 @@
 package org.firas.weixin.service;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Date;
@@ -93,6 +94,27 @@ public class MpService {
         this.ticketDao = ticketDao;
     }
 
+
+    public static String echoSign(
+            String nonce, String token, String timestamp) {
+        String[] parameters = new String[] {nonce, token, timestamp};
+        Arrays.sort(parameters);
+        StringBuilder buffer = new StringBuilder();
+        for (String item : parameters) {
+            buffer.append(item);
+        }
+        byte[] bytes = Hash.sha1(buffer.toString());
+        return HexString.byteArray2HexString(bytes, "");
+    }
+
+    public static boolean checkEcho(
+            String nonce, String token, String timestamp, String signature) {
+        if (null == nonce || null == token || null == timestamp ||
+                null == signature) {
+            return false;
+        }
+        return echoSign(nonce, token, timestamp).equalsIgnoreCase(signature);
+    }
 
     public static MpAccessToken getAccessToken(String appId, String appSecret)
             throws RestClientException, FileNotFoundException, IOException {

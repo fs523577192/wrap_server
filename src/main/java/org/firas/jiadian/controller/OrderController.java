@@ -29,7 +29,8 @@ import org.firas.jiadian.service.OrderService;
  *
  */
 @Slf4j
-@RestController("/jiadian/order")
+@RestController
+@RequestMapping("/jiadian/order")
 public class OrderController extends RequestController {
 
     private OrderService orderService;
@@ -51,6 +52,8 @@ public class OrderController extends RequestController {
                     parsePage(result, orderParser));
         } catch (ValidationException ex) {
             return ex.toResponse();
+        } catch (ActivityIdNotFoundException ex) {
+            return new JsonResponseNotFound(ex.getMessage());
         } catch (Exception ex) {
             return new JsonResponseFailUndefined("查询维修单列表失败",
                     ex.getMessage());
@@ -68,6 +71,8 @@ public class OrderController extends RequestController {
                     orderParser.parse(order));
         } catch (ValidationException ex) {
             return ex.toResponse();
+        } catch (ActivityIdNotFoundException ex) {
+            return new JsonResponseNotFound(ex.getMessage());
         } catch (Exception ex) {
             return new JsonResponseFailUndefined("接修失败",
                     ex.getMessage());
@@ -87,8 +92,6 @@ public class OrderController extends RequestController {
             return ex.toResponse();
         } catch (OrderIdNotFoundException ex) {
             return new JsonResponseNotFound(ex.getMessage());
-        } catch (OrderNameNotUniqueException ex) {
-            return new JsonResponseNameOccupied(ex.getMessage());
         } catch (Exception ex) {
             return new JsonResponseFailUndefined("修改维修单失败",
                     ex.getMessage());
@@ -110,6 +113,90 @@ public class OrderController extends RequestController {
             return new JsonResponseNotFound(ex.getMessage());
         } catch (Exception ex) {
             return new JsonResponseFailUndefined("删除维修单失败",
+                    ex.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/normal", method = RequestMethod.POST)
+    public JsonResponse setNormal(
+            OrderInput input,
+            HttpServletRequest request
+    ) {
+        try {
+            Order order = orderService.normal(input);
+            return new JsonResponseSuccess(
+                    "设置维修单状态为“待维修”成功",
+                    order.getStatusInfo());
+        } catch (ValidationException ex) {
+            return ex.toResponse();
+        } catch (OrderIdNotFoundException ex) {
+            return new JsonResponseNotFound(ex.getMessage());
+        } catch (Exception ex) {
+            return new JsonResponseFailUndefined(
+                    "设置维修单状态为“待维修”成功",
+                    ex.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/mend", method = RequestMethod.POST)
+    public JsonResponse setMending(
+            OrderInput input,
+            HttpServletRequest request
+    ) {
+        try {
+            Order order = orderService.mend(input);
+            return new JsonResponseSuccess(
+                    "设置维修单状态为“维修中”成功",
+                    order.getStatusInfo());
+        } catch (ValidationException ex) {
+            return ex.toResponse();
+        } catch (OrderIdNotFoundException ex) {
+            return new JsonResponseNotFound(ex.getMessage());
+        } catch (Exception ex) {
+            return new JsonResponseFailUndefined(
+                    "设置维修单状态为“维修中”成功",
+                    ex.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/fail", method = RequestMethod.POST)
+    public JsonResponse setFail(
+            OrderInput input,
+            HttpServletRequest request
+    ) {
+        try {
+            Order order = orderService.fail(input);
+            return new JsonResponseSuccess(
+                    "设置维修单状态为“维修失败”成功",
+                    order.getStatusInfo());
+        } catch (ValidationException ex) {
+            return ex.toResponse();
+        } catch (OrderIdNotFoundException ex) {
+            return new JsonResponseNotFound(ex.getMessage());
+        } catch (Exception ex) {
+            return new JsonResponseFailUndefined(
+                    "设置维修单状态为“维修失败”成功",
+                    ex.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/succeed", method = RequestMethod.POST)
+    public JsonResponse setSucceed(
+            OrderInput input,
+            HttpServletRequest request
+    ) {
+        try {
+            Order order = orderService.succeed(input);
+            return new JsonResponseSuccess(
+                    "设置维修单状态为“维修成功”成功",
+                    order.getStatusInfo());
+        } catch (ValidationException ex) {
+            return ex.toResponse();
+        } catch (OrderIdNotFoundException ex) {
+            return new JsonResponseNotFound(ex.getMessage());
+        } catch (Exception ex) {
+            return new JsonResponseFailUndefined(
+                    "设置维修单状态为“维修成功”成功",
                     ex.getMessage());
         }
     }

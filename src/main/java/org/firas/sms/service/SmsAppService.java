@@ -5,19 +5,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import org.firas.sms.dao.AppDao;
+import org.firas.sms.dao.SmsAppDao;
 import org.firas.sms.dao.AliyunAppDao;
-import org.firas.sms.dao.AppLogDao;
-import org.firas.sms.model.App;
+import org.firas.sms.dao.SmsAppLogDao;
+import org.firas.sms.model.SmsApp;
 import org.firas.sms.model.AliyunApp;
-import org.firas.sms.model.AppLog;
+import org.firas.sms.model.SmsAppLog;
 
 @Service
-public class AppService {
+public class SmsAppService {
 
-    private AppDao appDao;
+    private SmsAppDao appDao;
     @Autowired
-    public void setAppDao(AppDao appDao) {
+    public void setAppDao(SmsAppDao appDao) {
         this.appDao = appDao;
     }
 
@@ -27,13 +27,13 @@ public class AppService {
         this.aliyunAppDao = aliyunAppDao;
     }
 
-    private AppLogDao appLogDao;
+    private SmsAppLogDao appLogDao;
     @Autowired
-    public void setAppLogDao(AppLogDao appLogDao) {
+    public void setAppLogDao(SmsAppLogDao appLogDao) {
         this.appLogDao = appLogDao;
     }
 
-    public App getAppById(Integer appId) {
+    public SmsApp getAppById(Integer appId) {
         return appDao.findOne(appId);
     }
 
@@ -41,7 +41,7 @@ public class AppService {
         return aliyunAppDao.findFirstById(appId);
     }
 
-    public App getAppByName(String name) {
+    public SmsApp getAppByName(String name) {
         return appDao.findFirstByName(name);
     }
 
@@ -51,7 +51,7 @@ public class AppService {
             throws JsonProcessingException {
         aliyunApp.setApp( appDao.save(aliyunApp.getApp()) );
         aliyunApp = aliyunAppDao.save(aliyunApp);
-        AppLog appLog = new AppLog(aliyunApp.getId(), aliyunApp.getMapForLog(),
+        SmsAppLog appLog = new SmsAppLog(aliyunApp.getId(), aliyunApp.getMapForLog(),
                 true, operatorIp, userAgent, operatorId);
         appLog = appLogDao.save(appLog);
         return aliyunApp;
