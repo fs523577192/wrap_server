@@ -1,10 +1,6 @@
 package org.firas.wrap.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.firas.common.request.PageInput;
-import org.firas.common.response.input.JsonResponseInvalidInput;
-import org.firas.common.validator.ValidationException;
-import org.firas.wrap.input.ComponentInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +14,10 @@ import org.firas.common.response.JsonResponseFailUndefined;
 import org.firas.common.response.JsonResponseSuccess;
 import org.firas.common.response.notfound.JsonResponseNotFound;
 import org.firas.common.response.occupied.JsonResponseNameOccupied;
+import org.firas.common.response.input.JsonResponseInvalidInput;
+import org.firas.common.request.PageInput;
+import org.firas.common.validator.ValidationException;
+import org.firas.wrap.input.ComponentInput;
 import org.firas.wrap.datatype.ComponentIdNotFoundException;
 import org.firas.wrap.datatype.ComponentNameNotUniqueException;
 import org.firas.wrap.entity.Component;
@@ -68,7 +68,7 @@ public class ComponentController extends RequestController {
         } catch (ComponentNameNotUniqueException ex) {
             return new JsonResponseNameOccupied(ex.getMessage());
         } catch (Exception ex) {
-            return new JsonResponseFailUndefined("查询零部件列表失败",
+            return new JsonResponseFailUndefined("添加零部件失败",
                     ex.getMessage());
         }
     }
@@ -88,7 +88,7 @@ public class ComponentController extends RequestController {
         } catch (ComponentNameNotUniqueException ex) {
             return new JsonResponseNameOccupied(ex.getMessage());
         } catch (Exception ex) {
-            return new JsonResponseFailUndefined("查询零部件列表失败",
+            return new JsonResponseFailUndefined("修改零部件失败",
                     ex.getMessage());
         }
     }
@@ -106,7 +106,7 @@ public class ComponentController extends RequestController {
         } catch (ComponentIdNotFoundException ex) {
             return new JsonResponseNotFound(ex.getMessage());
         } catch (Exception ex) {
-            return new JsonResponseFailUndefined("查询零部件列表失败",
+            return new JsonResponseFailUndefined("删除零部件失败",
                     ex.getMessage());
         }
     }

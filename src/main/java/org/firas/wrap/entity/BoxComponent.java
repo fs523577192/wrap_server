@@ -1,11 +1,10 @@
 package org.firas.wrap.entity;
 
-import java.io.Serializable;
-import javax.persistence.Embeddable;
+import java.util.HashMap;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.persistence.Id;
+import javax.persistence.EmbeddedId;
 import javax.persistence.MapsId;
 import javax.persistence.Column;
 import javax.persistence.ManyToOne;
@@ -19,31 +18,32 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.firas.wrap.entity.embeddable.BoxComponentId;
+
 @Slf4j
 @Entity
 @Table(name = "t_box_component")
 @DynamicUpdate
 @NoArgsConstructor
-@AllArgsConstructor
-public class BoxComponent extends org.firas.common.model.IdModel {
+public class BoxComponent extends org.firas.common.model.StatusModel {
 
     @Transient
     private static final long serialVersionUID = 1L;
 
-    @Embeddable
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class BoxComponentId implements Serializable {
-
-        @Column(name = "box_id")
-        private int boxId;
-
-        @Column(name = "component_id")
-        private int componentId;
+    public BoxComponent(int componentId, int number) {
+        boxComponentId = new BoxComponentId();
+        boxComponentId.setComponentId(componentId);
+        this.number = number;
     }
 
-    @Id
+    public HashMap<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>(2, 1f);
+        result.put("number", number);
+        result.put("component", component.toMap());
+        return result;
+    }
+
+    @EmbeddedId
     @Getter @Setter private BoxComponentId boxComponentId;
 
     @ManyToOne

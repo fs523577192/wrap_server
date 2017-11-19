@@ -22,6 +22,14 @@ public abstract class StatusModel extends TimeModel {
     @Column(nullable = false)
     protected byte status = STATUS_NORMAL;
 
+    public byte getStatus() {
+        return status;
+    }
+
+    public void setStatus(byte status) {
+        this.status = status;
+    }
+
     public boolean isStatusDeleted() {
         return STATUS_DELETED == status;
     }

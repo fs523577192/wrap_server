@@ -86,7 +86,7 @@ public class ActivityService {
         validators.put("endTime", endTimeValidator);
         Activity activity = input.toActivity(validators);
         activity.setId(null);
-        ensureNameUnique(activity.getName());
+        ensureNameUnique(null, activity.getName());
         return activityRepository.save(activity);
     }
 
@@ -108,7 +108,7 @@ public class ActivityService {
         boolean changed = false;
         if (!c.getName().equals(activity.getName())) {
             changed = true;
-            ensureNameUnique(activity.getName());
+            ensureNameUnique(activity.getId(), activity.getName());
             c.setName(activity.getName());
         }
         if (!Objects.equals(c.getYear(), activity.getYear())) {
@@ -145,10 +145,14 @@ public class ActivityService {
         return a;
     }
     
-    private void ensureNameUnique(String name) throws ActivityNameNotUniqueException {
+    private void ensureNameUnique(Integer id, String name)
+            throws ActivityNameNotUniqueException {
         try {
-            getByName(name);
-            throw new ActivityNameNotUniqueException(name, "名称为" + name + "的维修活动已存在");
+            Activity activity = getByName(name);
+            if (!activity.getId().equals(id)) {
+                throw new ActivityNameNotUniqueException(
+                        name, "名称为" + name + "的维修活动已存在");
+            }
         } catch (ActivityNameNotFoundException ex) {}
     }
 

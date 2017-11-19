@@ -1,7 +1,9 @@
 package org.firas.wrap.service;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +42,11 @@ public class ComponentService {
         return component;
     }
 
+    public List<Component> findByIds(Collection<Integer> ids) {
+        return componentRepository.findByIdInAndStatusNot(
+                ids, Component.STATUS_DELETED);
+    }
+
     public Component getByName(String name)
             throws ComponentNameNotFoundException {
         Component component = componentRepository.findFirstByNameAndStatusNot(
@@ -72,7 +79,7 @@ public class ComponentService {
         validators.put("unit", unitValidator);
         Component component = input.toComponent(validators);
         component.setId(null);
-        ensureNameUnique(component.getName());
+        ensureNameUnique(null, component.getName());
         component.setNumber(0);
         return componentRepository.save(component);
     }
@@ -92,7 +99,7 @@ public class ComponentService {
         boolean changed = false;
         if (!c.getName().equals(component.getName())) {
             changed = true;
-            ensureNameUnique(component.getName());
+            ensureNameUnique(component.getId(), component.getName());
             c.setName(component.getName());
         }
         if (!Objects.equals(c.getUnit(), component.getUnit())) {
@@ -121,10 +128,14 @@ public class ComponentService {
         return c;
     }
     
-    private void ensureNameUnique(String name) throws ComponentNameNotUniqueException {
+    private void ensureNameUnique(Integer id, String name)
+            throws ComponentNameNotUniqueException {
         try {
-            getByName(name);
-            throw new ComponentNameNotUniqueException(name, "名称为" + name + "的零部件已存在");
+            Component component = getByName(name);
+            if (!component.getId().equals(id)) {
+                throw new ComponentNameNotUniqueException(
+                        name, "名称为" + name + "的零部件已存在");
+            }
         } catch (ComponentNameNotFoundException ex) {}
     }
 

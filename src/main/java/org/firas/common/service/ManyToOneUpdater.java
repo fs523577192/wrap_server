@@ -10,48 +10,92 @@ import org.firas.common.model.StatusModel;
 
 public abstract class ManyToOneUpdater<ID, M extends StatusModel> {
 
+    private Byte oldStatus, newStatus;
+
+    protected ManyToOneUpdater(Byte oldStatus, Byte newStatus) {
+        this.oldStatus = oldStatus;
+        this.newStatus = newStatus;
+    }
+
+    protected ManyToOneUpdater() {
+        this(StatusModel.STATUS_DELETED, StatusModel.STATUS_NORMAL);
+    }
+
     protected abstract ID getId(M model);
 
     /**
      * 
      * @return int  the number of rows changed
      */
-    protected abstract int activateByIds(List<ID> ids);
-
-    /**
-     * 
-     * @return int  the number of rows changed
-     */
-    protected abstract int deleteByIds(List<ID> ids);
+    protected abstract int setStatusByIds(List<ID> ids, Byte status);
 
     protected abstract void batchCreate(Collection<M> models);
+    protected void batchUpdate(Collection<M> models) {}
+    protected boolean batchSave(Collection<M> models) {
+        return false;
+    }
 
-    public void update(List<M> originalOnes, List<M> newOnes) {
-        Map<ID, M> map = new HashMap<ID, M>();
+    protected boolean modelEquals(M a, M b) {
+        return true;
+    }
+
+    public void update(Collection<M> originalOnes, Collection<M> newOnes) {
+        Map<ID, M> map = new HashMap<ID, M>(newOnes.size(), 1f);
         for (M item : newOnes) {
             map.put(getId(item), item);
         }
 
+        List<M> toSave = new ArrayList<M>();
+        List<M> toUpdate = new ArrayList<M>();
         List<ID> activateIds = new ArrayList<ID>();
         List<ID> deleteIds = new ArrayList<ID>();
         for (M item : originalOnes) {
             ID id = getId(item);
-            if (map.containsKey(id)) {
-                if (!item.isStatusNormal()) {
+            M newOne = map.get(id);
+            if (null != newOne) {
+                if (!modelEquals(newOne, item)) {
+                    toSave.add(newOne);
+                    toUpdate.add(newOne);
+                } else if (!newStatus.equals(item.getStatus())) {
+                    newOne.setStatus(newStatus);
+                    toSave.add(newOne);
                     activateIds.add(id);
                 }
                 map.remove(id);
             } else {
-                if (!item.isStatusDeleted()) {
+                if (!oldStatus.equals(item.getStatus())) {
+                    item.setStatus(oldStatus);
+                    toSave.add(item);
                     deleteIds.add(id);
                 }
             }
         }
 
-        if (!activateIds.isEmpty()) activateByIds(activateIds);
-        if (!deleteIds.isEmpty()) deleteByIds(deleteIds);
+        if (!batchSave(toSave)) {
+            multiSave(activateIds, deleteIds, toUpdate, map);
+        }
+    }
+
+    private void multiSave(
+                List<ID> activateIds, List<ID> deleteIds,
+                List<M> toUpdate, Map<ID, M> map) {
+        if (!activateIds.isEmpty()) {
+            setStatusByIds(activateIds, newStatus);
+        }
+        if (!deleteIds.isEmpty()) {
+            setStatusByIds(deleteIds, oldStatus);
+        }
+
+        if (!toUpdate.isEmpty()) {
+            batchUpdate(toUpdate);
+        }
 
         Collection<M> toCreate = map.values();
-        if (!toCreate.isEmpty()) batchCreate(toCreate);
+        for (M item : toCreate) {
+            item.setStatus(newStatus);
+        }
+        if (!toCreate.isEmpty()) {
+            batchCreate(toCreate);
+        }
     }
 }

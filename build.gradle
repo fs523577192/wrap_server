@@ -38,6 +38,7 @@ dependencies {
     compile("mysql:mysql-connector-java")
     compile("com.sun.mail:javax.mail")
     compile("com.aliyun.mns:aliyun-sdk-mns:1.1.8")
+    compile("net.sf.barcode4j:barcode4j:2.1")
     compileOnly("org.projectlombok:lombok")
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

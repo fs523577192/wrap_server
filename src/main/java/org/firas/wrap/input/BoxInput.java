@@ -2,6 +2,7 @@ package org.firas.wrap.input;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import org.firas.common.request.InputValidation;
 import org.firas.common.validator.IValidator;
 import org.firas.common.validator.ValidationException;
 import org.firas.wrap.entity.Box;
+import org.firas.wrap.entity.BoxComponent;
 
 /**
  *
@@ -54,10 +56,13 @@ public class BoxInput {
                 throw new ValidationException(validation.getErrors());
             }
             Map<Integer, Integer> temp = validation.getNewValue();
+            Map<Integer, BoxComponent> components = new HashMap<>();
             for (Map.Entry<Integer, Integer> entry : temp.entrySet()) {
                 Integer componentId = entry.getKey();
                 Integer number = entry.getValue();
+                components.put(componentId, new BoxComponent(componentId, number));
             }
+            result.setComponents(components);
         }
         return result;
     }
