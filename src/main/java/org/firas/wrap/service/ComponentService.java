@@ -42,6 +42,15 @@ public class ComponentService {
         return component;
     }
 
+    public Component getById(ComponentInput input)
+            throws ComponentIdNotFoundException,
+            ValidationException {
+        Map<String, IValidator> validators = new HashMap<>(1, 1f);
+        validators.put("id", idValidator);
+        Component component = input.toComponent(validators);
+        return getById(component.getId());
+    }
+
     public List<Component> findByIds(Collection<Integer> ids) {
         return componentRepository.findByIdInAndStatusNot(
                 ids, Component.STATUS_DELETED);
@@ -116,11 +125,7 @@ public class ComponentService {
     public Component remove(ComponentInput input)
             throws ValidationException,
             ComponentIdNotFoundException {
-        Map<String, IValidator> validators = new HashMap<>(1, 1f);
-        validators.put("id", idValidator);
-        Component component = input.toComponent(validators);
-
-        Component c = getById(component.getId());
+        Component c = getById(input);
         if (!c.isStatusDeleted()) {
             c.statusDeleted();
             return componentRepository.save(c);

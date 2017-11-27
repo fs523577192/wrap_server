@@ -64,6 +64,15 @@ public class BoxService {
         return box;
     }
 
+    public Box getById(BoxInput input)
+            throws BoxIdNotFoundException,
+            ValidationException {
+        Map<String, IValidator> validators = new HashMap<>(1, 1f);
+        validators.put("id", idValidator);
+        Box b = input.toBox(validators);
+        return getById(b.getId());
+    }
+
     public Box getByName(String name)
             throws BoxNameNotFoundException {
         Box box = boxRepository.findFirstByNameAndStatusNot(
@@ -77,11 +86,7 @@ public class BoxService {
     public HashMap<String, Object> getWithComponentsById(BoxInput input)
             throws BoxIdNotFoundException,
             ValidationException {
-        Map<String, IValidator> validators = new HashMap<>(1, 1f);
-        validators.put("id", idValidator);
-        Box b = input.toBox(validators);
-
-        Box box = getById(b.getId());
+        Box box = getById(input);
         List<BoxComponent> components =
                 boxComponentRepository.findByBoxAndStatus(
                         box, BoxComponent.STATUS_NORMAL);
@@ -171,11 +176,7 @@ public class BoxService {
     public Box use(BoxInput input)
             throws ValidationException,
             BoxIdNotFoundException {
-        Map<String, IValidator> validators = new HashMap<>(1, 1f);
-        validators.put("id", idValidator);
-        Box box = input.toBox(validators);
-
-        Box b = getById(box.getId());
+        Box b = getById(input);
         if (!b.isStatusUsed()) {
             b.statusUsed();
             return boxRepository.save(b);
@@ -187,11 +188,7 @@ public class BoxService {
     public Box remove(BoxInput input)
             throws ValidationException,
             BoxIdNotFoundException {
-        Map<String, IValidator> validators = new HashMap<>(1, 1f);
-        validators.put("id", idValidator);
-        Box box = input.toBox(validators);
-
-        Box b = getById(box.getId());
+        Box b = getById(input);
         if (!b.isStatusDeleted()) {
             b.statusDeleted();
             return boxRepository.save(b);

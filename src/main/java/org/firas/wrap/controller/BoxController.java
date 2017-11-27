@@ -1,12 +1,23 @@
 package org.firas.wrap.controller;
 
 import java.util.HashMap;
+import java.io.IOException;
+import java.io.Serializable;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.firas.common.controller.RequestController;
 import org.firas.common.datatype.ModelParser;
@@ -18,18 +29,22 @@ import org.firas.common.response.occupied.JsonResponseNameOccupied;
 import org.firas.common.response.input.JsonResponseInvalidInput;
 import org.firas.common.request.PageInput;
 import org.firas.common.validator.ValidationException;
+import org.firas.common.helper.ImageOutputHelper;
+
 import org.firas.wrap.input.BoxInput;
 import org.firas.wrap.datatype.BoxIdNotFoundException;
 import org.firas.wrap.datatype.BoxNameNotUniqueException;
 import org.firas.wrap.datatype.ComponentIdNotFoundException;
 import org.firas.wrap.entity.Box;
 import org.firas.wrap.service.BoxService;
+import org.firas.wrap.helper.BarcodeHelper;
+import org.firas.wrap.helper.IntegerPaddingHelper;
 
 /**
  *
  */
 @Slf4j
-@RestController
+@Controller
 @RequestMapping("/box")
 public class BoxController extends RequestController {
 
@@ -41,6 +56,7 @@ public class BoxController extends RequestController {
 
     private static ModelParser<Box> boxParser = (box) -> box.toMap();
 
+    @ResponseBody
     @RequestMapping(method = RequestMethod.GET)
     public JsonResponse listAllBoxes(
             PageInput input
@@ -57,6 +73,7 @@ public class BoxController extends RequestController {
         }
     }
 
+    @ResponseBody
     @RequestMapping(value = "/components", method = RequestMethod.GET)
     public JsonResponse findComponentsByBoxId(
             BoxInput input
@@ -76,6 +93,46 @@ public class BoxController extends RequestController {
         }
     }
 
+    @RequestMapping(value = "/barcode", method = RequestMethod.GET)
+    public ResponseEntity<? extends Serializable> getBarcodeByBoxId(
+            BoxInput input
+    ) throws IOException {
+        try {
+            try {
+                final Box box = boxService.getById(input);
+                final BufferedImage image = BarcodeHelper.draw(
+                        'B' + IntegerPaddingHelper.padTo(box.getId(), 9));
+                final BufferedImage result = BarcodeHelper.createResultImage();
+                final Graphics2D canvas = BarcodeHelper.getGraphics2D(result);
+                final int x = (result.getWidth() - image.getWidth()) >> 1;
+                BarcodeHelper.placeOnResult(canvas, image,
+                        30, "--== 出货箱 ==--", box.getName(),
+                        x, 90, 40, 80);
+                final byte[] binary = ImageOutputHelper.getBytesFromImage(
+                        result, ImageOutputHelper.FORMAT_PNG);
+                return new ResponseEntity<byte[]>(
+                        binary, pngHeaders, HttpStatus.OK);
+            } catch (ValidationException ex) {
+                String json = new ObjectMapper().writeValueAsString(
+                        ex.toResponse());
+                return new ResponseEntity<String>(
+                        json, jsonHeaders, HttpStatus.BAD_REQUEST);
+            } catch (BoxIdNotFoundException ex) {
+                String json = new ObjectMapper().writeValueAsString(
+                        new JsonResponseNotFound(ex.getMessage()));
+                return new ResponseEntity<String>(
+                        json, jsonHeaders, HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception ex) {
+            String message = "查询出货箱条形码失败";
+            String json = new ObjectMapper().writeValueAsString(
+                    new JsonResponseFailUndefined(message, ex.getMessage()));
+            return new ResponseEntity<String>(
+                    json, jsonHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @ResponseBody
     @RequestMapping(method = RequestMethod.POST)
     public JsonResponse createBox(
             BoxInput input
@@ -97,6 +154,7 @@ public class BoxController extends RequestController {
         }
     }
 
+    @ResponseBody
     @RequestMapping(method = RequestMethod.PATCH)
     public JsonResponse updateBox(
             BoxInput input
@@ -117,6 +175,7 @@ public class BoxController extends RequestController {
         }
     }
 
+    @ResponseBody
     @RequestMapping(method = RequestMethod.DELETE)
     public JsonResponse removeBox(
             BoxInput input
@@ -133,5 +192,14 @@ public class BoxController extends RequestController {
             return new JsonResponseFailUndefined("删除出货箱失败",
                     ex.getMessage());
         }
+    }
+
+    private static final HttpHeaders jsonHeaders = new HttpHeaders();
+    private static final HttpHeaders pngHeaders = new HttpHeaders();
+    static {
+        jsonHeaders.add(HttpHeaders.CONTENT_TYPE,
+                MediaType.APPLICATION_JSON_UTF8_VALUE);
+        pngHeaders.add(HttpHeaders.CONTENT_TYPE,
+                MediaType.IMAGE_PNG_VALUE);
     }
 }
